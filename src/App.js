@@ -1,17 +1,13 @@
 import Stats from 'stats.js';
-import NoiseFragmentShader from './shaders/NoiseFrag.glsl';
-import NoiseVertexShader from './shaders/NoiseVert.glsl';
 import HeightMap from './HeightMap';
 import BrickGrid from './BrickGrid';
 
-const NEAR = 0.1;
-const FAR = 1000;
+const GRID_SIZE = 10;
 
 export default class App {
     constructor() {
         this._bind('_render', '_handleResize');
         this._setup3D();
-        this._setupNoise();
         this._setupHeightMap();
         this._createScene();
 
@@ -45,16 +41,8 @@ export default class App {
     }
 
     _setupHeightMap() {
-        const heightMap = this._heightMap = new HeightMap();
-    }
-
-    _setupNoise() {
-        const noiseMaterial = this._noiseMaterial = new THREE.ShaderMaterial({
-            fragmentShader: NoiseFragmentShader,
-            vertexShader: NoiseVertexShader,
-            uniforms: {
-                time: {type: 'f', value: 0}
-            }
+        const heightMap = this._heightMap = new HeightMap({
+            resolution: GRID_SIZE
         });
     }
 
@@ -63,18 +51,22 @@ export default class App {
 
         this._createLights();
 
-        var floor = new THREE.GridHelper(200, 50, 0x333333, 0x333333);
-        scene.add(floor);
-
-        var pPlaneGeo = new THREE.PlaneGeometry(100, 100);
-        var pPlane = new THREE.Mesh(pPlaneGeo, this._noiseMaterial);
-        pPlane.rotation.x = -Math.PI/2;
-        pPlane.position.x = -500;
-        pPlane.position.z = 100;
-        scene.add(pPlane);
-
-        var grid = new BrickGrid();
+        var grid = this._grid = new BrickGrid({
+            rows: GRID_SIZE,
+            cols: GRID_SIZE
+        });
         scene.add(grid);
+
+        // var debugSprite = new THREE.Sprite(new THREE.SpriteMaterial({map: this._heightMap.texture}));
+        // debugSprite.scale.set(100, 100, 100);
+        // debugSprite.position.x = 300;
+        // scene.add(debugSprite);
+
+        var debugQuad = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshBasicMaterial({map: this._heightMap.texture}));
+        debugQuad.rotation.x = -Math.PI / 2;
+        debugQuad.position.x = 300;
+        debugQuad.position.z = -200;
+        scene.add(debugQuad);
     }
 
     _createLights() {
@@ -95,24 +87,16 @@ export default class App {
         const renderer = this._renderer;
         const stats = this._stats;
         const heightMap = this._heightMap;
+        const grid = this._grid;
 
         stats.begin();
         heightMap.update(renderer);
-        this._updateNoise(timestamp);
+        grid.update(heightMap.data);
         camera.lookAt(scene.position);
         renderer.render(scene, camera);
         stats.end();
 
         requestAnimationFrame(this._render);
-    }
-
-    _updateNoise(timestamp) {
-        const start = this._start;
-        const noiseMaterial = this._noiseMaterial;
-
-        // var time = .00025 * (Date.now() - this._start);
-        var time = .00025 * (Date.now() - this._start);
-        noiseMaterial.uniforms['time'].value = time;
     }
 
     _handleResize(event) {

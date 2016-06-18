@@ -102,8 +102,7 @@ float cnoise(vec3 P) {
 }
 
 // Classic Perlin noise, periodic variant
-float pnoise(vec3 P, vec3 rep)
-{
+float pnoise(vec3 P, vec3 rep) {
   vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
   vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
   Pi0 = mod289(Pi0);
@@ -174,6 +173,7 @@ float pnoise(vec3 P, vec3 rep)
 varying vec2 vUv;
 uniform float time;
 void main() {
-    float val = cnoise(vec3(vUv, time));
+//    float val = cnoise(vec3(vUv, time));
+    float val = pnoise(vec3(vUv, time), vec3(10.0));
     gl_FragColor = vec4(val, val, val, 1.0);
 }

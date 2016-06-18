@@ -1,7 +1,7 @@
 {
   "name": "brickflow",
   "version": "1.0.0",
-  "description": "A WebGL experiment with Perlin noise",
+  "description": "A WebGL experiment",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

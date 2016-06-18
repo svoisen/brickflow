@@ -15,10 +15,14 @@ export default class HeightMap {
         return this._pixelBuffer;
     }
 
+    get texture() {
+        return this._texture;
+    }
+
     _create() {
         const options = this._options;
 
-        const target = this._target = new THREE.WebGLRenderTarget(options.resolution, options.resolution);
+        const texture = this._texture = new THREE.WebGLRenderTarget(options.resolution, options.resolution);
         const camera = this._camera = new THREE.OrthographicCamera(options.resolution / -2, options.resolution / 2, options.resolution / 2, options.resolution / -2, -1000, 1000);
         const scene = this._scene = new THREE.Scene();
 
@@ -38,7 +42,7 @@ export default class HeightMap {
     update(renderer) {
         const scene = this._scene;
         const camera = this._camera;
-        const target = this._target;
+        const target = this._texture;
         const material = this._material;
         const options = this._options;
 

@@ -7,7 +7,8 @@ export default class Brick extends THREE.Object3D {
         
         this._options = _.defaults(options || {}, {
             size: 50,
-            height: 50
+            height: 50,
+            color: 0xff0000
         });
 
         this._height = options.height;
@@ -33,10 +34,23 @@ export default class Brick extends THREE.Object3D {
         return this._height;
     }
 
+    set color(color) {
+        if (color.equals(this._material.color)) {
+            return;
+        }
+        
+        this._material.color = color;
+    }
+
+    get color() {
+        return this._material.color;
+    }
+
     _create() {
         const options = this._options;
 
-        var mat = new THREE.MeshLambertMaterial({color: 0xff0000});
+        var mat = this._material = new THREE.MeshLambertMaterial({color: options.color});
+
         var cubeGeo = new THREE.BoxGeometry(options.size, this._height, options.size);
         var cube = this._cube = new THREE.Mesh(cubeGeo, mat);
         cube.position.y = this._height * 0.5;

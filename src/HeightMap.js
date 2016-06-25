@@ -9,8 +9,34 @@ export default class HeightMap {
             speedMultiplier: Defaults.speedMultiplier
         });
 
+        this._textureVisible = false;
         this._pixelBuffer = new Uint8Array(this._options.resolution * this._options.resolution * 4);
         this._create();
+    }
+
+    set textureVisible(v) {
+        if (this._textureVisible === v) {
+            return;
+        }
+
+        const renderer = this._renderer;
+        if (v) {
+            renderer.domElement.style.top = '48px';
+            renderer.domElement.style.left = 0;
+            renderer.domElement.style.width = '80px';
+            renderer.domElement.style.height = '80px';
+            renderer.domElement.style.position = 'fixed';
+            document.body.appendChild(renderer.domElement);
+        }
+        else {
+            document.body.removeChild(renderer.domElement);
+        }
+
+        this._textureVisible = v;
+    }
+
+    get textureVisible() {
+       return this._textureVisible;
     }
 
     get data() {
@@ -32,6 +58,9 @@ export default class HeightMap {
     _create() {
         const options = this._options;
 
+        const renderer = this._renderer = new THREE.WebGLRenderer({antialias: false});
+        renderer.setSize(options.resolution, options.resolution);
+
         const target = this._target = new THREE.WebGLRenderTarget(options.resolution, options.resolution);
         const camera = this._camera = new THREE.OrthographicCamera(options.resolution / -2, options.resolution / 2, options.resolution / 2, options.resolution / -2, -1000, 1000);
         const scene = this._scene = new THREE.Scene();
@@ -49,7 +78,8 @@ export default class HeightMap {
         scene.add(quad);
     }
 
-    update(renderer) {
+    update() {
+        const renderer = this._renderer;
         const scene = this._scene;
         const camera = this._camera;
         const target = this._target;
@@ -63,5 +93,9 @@ export default class HeightMap {
         material.uniforms['time'].value = 0.001 * options.speedMultiplier * (Date.now() - this._startTime);
         renderer.render(scene, camera, target);
         renderer.readRenderTargetPixels(target, 0, 0, options.resolution, options.resolution, this._pixelBuffer);
+
+        if (this._textureVisible) {
+            renderer.render(scene, camera);
+        }
     }
 }

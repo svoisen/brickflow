@@ -43,7 +43,6 @@ export default class App {
         scene.add(camera);
 
         const stats = this._stats = new Stats();
-        document.body.appendChild(stats.dom);
     }
 
     _setupHeightMap() {
@@ -80,6 +79,16 @@ export default class App {
         model.addEventListener('change:speedMultiplier', function(event) {
             this._heightMap.speedMultiplier = event.value;
         }.bind(this));
+
+        model.addEventListener('change:showDebug', function(event) {
+            if (event.value) {
+                document.body.appendChild(this._stats.dom);
+            }
+            else {
+                document.body.removeChild(this._stats.dom);
+            }
+            this._heightMap.textureVisible = event.value;
+        }.bind(this));
     }
 
     _createGUI() {
@@ -90,10 +99,10 @@ export default class App {
         gui.addColor(model, 'color').name('Color');
         gui.add(model, 'minLightness').min(0).max(1).name('Min Lightness');
         gui.add(model, 'maxLightness').min(0).max(1).name('Max Lightness');
-        gui.add(model, 'minHeight').min(10).max(300).name('Min Height');
-        gui.add(model, 'maxHeight').min(10).max(300).name('Max Height');
+        gui.add(model, 'minHeight').min(10).max(500).name('Min Height');
+        gui.add(model, 'maxHeight').min(10).max(500).name('Max Height');
         gui.add(model, 'speedMultiplier').min(0).max(2).name('Speed');
-        gui.add(model, 'showHeightMap').name('Show Map');
+        gui.add(model, 'showDebug').name('Show Debug');
     }
 
     _createScene() {
@@ -141,7 +150,7 @@ export default class App {
         const grid = this._grid;
 
         stats.begin();
-        heightMap.update(renderer);
+        heightMap.update();
         grid.update(heightMap.data);
         renderer.render(scene, camera);
         stats.end();

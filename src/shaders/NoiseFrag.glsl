@@ -175,5 +175,6 @@ uniform float time;
 void main() {
     float val = cnoise(vec3(vUv, time));
 //    float val = pnoise(vec3(vUv, time), vec3(10.0));
+//    float val = (vUv.x * sin(time) + vUv.y * cos(time))/(vUv.x + vUv.y);
     gl_FragColor = vec4(val, val, val, 1.0);
 }

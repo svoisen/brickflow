@@ -10,7 +10,7 @@ export default class Model extends THREE.EventDispatcher {
             maxHeight: Defaults.maxHeight,
             minLightness: Defaults.minLightness,
             maxLightness: Defaults.maxLightness,
-            showHeightMap: false,
+            showDebug: false,
             gridSize: Defaults.gridSize,
             speedMultiplier: Defaults.speedMultiplier
         }));

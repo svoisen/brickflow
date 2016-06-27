@@ -2,11 +2,12 @@ import Defaults from './Defaults';
 import NoiseFragmentShader from './shaders/NoiseFrag.glsl';
 import NoiseVertexShader from './shaders/NoiseVert.glsl';
 
-export default class HeightMap {
+class HeightMap {
     constructor(options) {
         this._options = _.defaults(options || {}, {
             resolution: Defaults.gridSize,
-            speedMultiplier: Defaults.speedMultiplier
+            speedMultiplier: Defaults.speedMultiplier,
+            mapFunction: HeightMap.PERLIN_NOISE
         });
 
         this._textureVisible = false;
@@ -54,6 +55,22 @@ export default class HeightMap {
     set speedMultiplier(v) {
         this._options.speedMultiplier = v;
     }
+    
+    get mapFunction() {
+        return this._options.mapFunction;    
+    }
+    
+    set mapFunction(f) {
+        const options = this._options;
+        const material = this._material;
+
+        if (options.mapFunction === f) {
+            return;
+        }
+
+        options.mapFunction = f;
+        material.uniforms['mapFunction'].value = f;
+    }
 
     _create() {
         const options = this._options;
@@ -67,7 +84,9 @@ export default class HeightMap {
 
         const material = this._material = new THREE.ShaderMaterial({
             uniforms: {
-                time: {type: 'f', value: 0}
+                time: {type: 'f', value: 0},
+                mapFunction: {type: 'i', value: options.mapFunction},
+                resolution: {type: 'f', value: options.resolution}
             },
             vertexShader: NoiseVertexShader,
             fragmentShader: NoiseFragmentShader
@@ -99,3 +118,8 @@ export default class HeightMap {
         }
     }
 }
+
+HeightMap.PERLIN_NOISE = 0;
+HeightMap.SINE = 1;
+
+export default HeightMap;

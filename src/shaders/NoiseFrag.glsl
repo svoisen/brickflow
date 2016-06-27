@@ -1,3 +1,11 @@
+#define PNOISE 0
+#define SINE 1
+
+varying vec2 vUv;
+uniform float time;
+uniform int mapFunction;
+uniform float resolution;
+
 //
 // GLSL textureless classic 3D noise "cnoise",
 // with an RSL-style periodic variant "pnoise".
@@ -170,11 +178,26 @@ float pnoise(vec3 P, vec3 rep) {
     return 2.2 * n_xyz;
 }
 
-varying vec2 vUv;
-uniform float time;
 void main() {
-    float val = cnoise(vec3(vUv, time));
-//    float val = pnoise(vec3(vUv, time), vec3(10.0));
-//    float val = (vUv.x * sin(time) + vUv.y * cos(time))/(vUv.x + vUv.y);
-    gl_FragColor = vec4(val, val, val, 1.0);
+    float val;
+
+    if (mapFunction == PNOISE) {
+        val = cnoise(vec3(vUv, time));
+    }
+    else if (mapFunction == SINE) {
+//        float p = vUv.x * vUv.x + vUv.y * vUv.y;
+//        val = sin(time + 5.0 * vUv.x)/vUv.x;
+//        val = sin(time * p)/p;
+        float period = resolution / 2.0;
+        val = (sin(time + period * vUv.y) + 1.0) * 0.5;
+//        val = (sin(time + 10.0 * -vUv.y * vUv.x) + 1.0) * 0.5;
+//        val = (vUv.x * sin(time) + vUv.y * cos(time))/(vUv.x + vUv.y);
+//        val = (sin(time + 10.0 * vUv.x) + cos(time + 10.0 * vUv.y))/(vUv.x + vUv.y);
+//        val = (sin(time + 2.0 * vUv.x) + cos(time + 2.0 * vUv.y) + 2.0) * 0.5;
+    }
+    else {
+        val = 0.0;
+    }
+
+    gl_FragColor = vec4(vec3(val), 1.0);
 }

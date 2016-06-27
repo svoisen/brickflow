@@ -1,4 +1,5 @@
 import Defaults from './Defaults';
+import HeightMap from './HeightMap';
 
 export default class Model extends THREE.EventDispatcher {
     constructor(options) {
@@ -12,7 +13,8 @@ export default class Model extends THREE.EventDispatcher {
             maxLightness: Defaults.maxLightness,
             showDebug: false,
             gridSize: Defaults.gridSize,
-            speedMultiplier: Defaults.speedMultiplier
+            speedMultiplier: Defaults.speedMultiplier,
+            mapFunction: HeightMap.SINE
         }));
     }
 

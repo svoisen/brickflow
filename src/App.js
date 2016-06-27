@@ -49,7 +49,9 @@ export default class App {
         const model = this._model;
 
         const heightMap = this._heightMap = new HeightMap({
-            resolution: model.gridSize
+            resolution: model.gridSize,
+            mapFunction: model.mapFunction,
+            speedMultiplier: model.speedMultiplier
         });
     }
 
@@ -89,6 +91,10 @@ export default class App {
             }
             this._heightMap.textureVisible = event.value;
         }.bind(this));
+
+        model.addEventListener('change:mapFunction', function(event) {
+            this._heightMap.mapFunction = event.value;
+        }.bind(this));
     }
 
     _createGUI() {
@@ -102,6 +108,7 @@ export default class App {
         gui.add(model, 'minHeight').min(10).max(500).name('Min Height');
         gui.add(model, 'maxHeight').min(10).max(500).name('Max Height');
         gui.add(model, 'speedMultiplier').min(0).max(2).name('Speed');
+        gui.add(model, 'mapFunction', {"Perlin Noise": HeightMap.PERLIN_NOISE, "Sine Wave": HeightMap.SINE}).name('Map Function');
         gui.add(model, 'showDebug').name('Show Debug');
     }
 
@@ -121,12 +128,6 @@ export default class App {
         grid.position.x += 100;
         grid.position.z += 100;
         scene.add(grid);
-
-        // var debugQuad = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshBasicMaterial({map: this._heightMap.texture}));
-        // debugQuad.rotation.x = -Math.PI / 2;
-        // debugQuad.position.x = 300;
-        // debugQuad.position.z = -200;
-        // scene.add(debugQuad);
     }
 
     _createLights() {
